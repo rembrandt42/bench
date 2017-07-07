@@ -5981,36 +5981,36 @@ var UPGRADES=window.UPGRADES= [
                         }
                     }
                 }
-            },
-            {name:"Bomblet Generator",
-                unique:true,
-                done:true,
-                img:"seismic.png",
-                snd:"explode",
-                takesdouble:true,
-                type: Unit.BOMB,
-                points: 3,
-                width: 16,
-                height:8,
-                size:15,
-                permanent:true,
-                explode:function() {
-                    if (phase==ACTIVATION_PHASE&&!this.exploded) {
-                        var r=this.getrangeallunits();
-                        for (var i=0; i<r[1].length; i++) {
-                            var roll=this.unit.rollattackdie(2,this,"hit");
-                            for (var i=0; i<2; i++) {
-                                if (roll[i]=="hit"||roll[i]=="critical") {
-                                    t.log("+1 %HIT% [%0]",this.name); 
-                                    t.resolvehit(1); 
-                                    t.checkdead(); 
-                                }
+            }
+        },
+        {name:"Bomblet Generator",
+            unique:true,
+            done:true,
+            img:"seismic.png",
+            snd:"explode",
+            takesdouble:true,
+            type: Unit.BOMB,
+            points: 3,
+            width: 16,
+            height:8,
+            size:15,
+            permanent:true,
+            explode:function() {
+                if (phase==ACTIVATION_PHASE&&!this.exploded) {
+                    var r=this.getrangeallunits();
+                    for (var i=0; i<r[1].length; i++) {
+                        var roll=this.unit.rollattackdie(2,this,"hit");
+                        for (var i=0; i<2; i++) {
+                            if (roll[i]=="hit"||roll[i]=="critical") {
+                                t.log("+1 %HIT% [%0]",this.name); 
+                                t.resolvehit(1); 
+                                t.checkdead(); 
                             }
                         }
-                        this.explode_base();
                     }
-                
+                    this.explode_base();
                 }
-            },
-        }
+                
+            }
+        },
     ];
