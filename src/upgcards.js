@@ -3592,11 +3592,13 @@ var UPGRADES=window.UPGRADES= [
 	done:true,
 	points: 2,
 	init: function(sh) {
-	    var self=this;
-	    sh.wrap_after("resolveslam",this,function() {
-		this.doaction(this.getactionlist(),"+1 free action (Skip to cancel) ["+self.name+"]");
-	    });
-	}
+            var self=this;
+            sh.wrap_after("resolveslam",this,function() {
+                sh.wrap_before("endmaneuver",this,function() {
+                    this.doaction(this.getactionlist(),"+1 free action (Skip to cancel) ["+self.name+"]");
+                });
+            });
+        }
     },
     {
         name: "Twin Ion Engine Mk. II",
