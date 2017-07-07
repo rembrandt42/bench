@@ -511,6 +511,7 @@
 	"Fanatical Devotion":{"text":"When defending, you cannot spend focus tokens. When attacking, if you spend a focus token to change all %FOCUS% results to hit results, set aside the first focus result that you change. The set-aside %HIT% result cannot be canceled by defense dice, but the defender may cancel %CRIT% results before it. During the End phase, remove this card."},
 	"I'll Show You the Dark Side":{"text":"When this card is assigned, if it is not already in play, the player who assigned it searches the Damage deck for 1 Damage card with the Pilot trait and may place it faceup on this card. Then shuffle the damage deck. When you suffer critical damage during an attack, you are instead dealt the chosen faceup Damage card. When there is no Damage card on this card, remove it."},
 	"Suppressive Fire":{"text":"When attacking a ship other than 'Captain Rex', roll 1 fewer attack die. When you declare an attack targeting 'Captain Rex' or when 'Captain Rex' is destroyed, remove this card. At the end of the Combat phase, if 'Captain Rex' did not perform an attack this phase, remove this card."},
-	"A Debt To Pay":{"text":"When attacking a ship that has the 'A Score to Settle' Upgrade card, you may change 1 % result to a %CRIT% result."}
+	"A Debt To Pay":{"text":"When attacking a ship that has the 'A Score to Settle' Upgrade card, you may change 1 % result to a %CRIT% result."},
+        "Bomblet Generator":{"rating":3,"text":"When you reveal your maneuver, you may drop 1 bomblet token. This token detonates at the end of the Activation phase."}
 }
 }
