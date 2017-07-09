@@ -135,7 +135,7 @@ var UPGRADES=window.UPGRADES= [
 	},
 	action: function(n) {
 	    var self=this;
-	    if (this.isactive) {
+	    if (!this.isactive) {
 		this.unit.defenseroll(1).done(function(roll) {
 		    if (Unit.FE_evade(roll.roll)+Unit.FE_focus(roll.roll)>0) {
 			for (var i=0; i<this.criticals.length; i++)
@@ -332,7 +332,7 @@ var UPGRADES=window.UPGRADES= [
 	init: function(sh) {
 	    var self=this;
 	    if (typeof Unit.prototype.getswarm=="undefined")
-		Unit.prototype.getswarm=function() { return [[],[],[]]; };
+                Unit.prototype.getswarm=function() { return [[],[],[]]; };
 	    Unit.prototype.wrap_after("getswarm",this,function(p) {
 		p[self.unit.team]=p[self.unit.team].concat(self.unit);
 		return p;
@@ -480,7 +480,7 @@ var UPGRADES=window.UPGRADES= [
 		}.bind(this),str:"blank"});
 	    sh.wrap_after("setpriority",this,function(a) {
 		if (a.type=="TARGET"&&missile.isactive&&this.candotarget()) 
-		    a.priority+=10;
+                    a.priority+=10;
 	    });
 
 	},
@@ -587,7 +587,7 @@ var UPGRADES=window.UPGRADES= [
 	    var self=this;
 	    sh.wrap_after("setpriority",this,function(a) {
 		if (a.type=="TARGET"&&self.isactive&&this.candotarget()) 
-		    a.priority+=10;
+                    a.priority+=10;
 	    });
 
 	},
@@ -655,7 +655,7 @@ var UPGRADES=window.UPGRADES= [
 	    var k0=function(k) { return k===0; };
 	    var zero=function() { return 0;};
 	    for (var i in sh.weapons) 
-		sh.weapons[i].immediateattack={pred:k0,weapon:zero};
+                sh.weapons[i].immediateattack={pred:k0,weapon:zero};
 	    sh.addattack(function(c,h) { 
 		return this.weapons[0].isactive&&c+h===0; 
 	    },this,[sh.weapons[0]],function() {	
@@ -928,7 +928,7 @@ var UPGRADES=window.UPGRADES= [
 	    sh.installed=true;
 	    sh.wrap_after("getdial",this,function(gd) {
 		for (var i=0; i<gd.length; i++)
-		    if (gd[i].move.match(/F[1-5]/)) gd[i].difficulty="GREEN";
+                    if (gd[i].move.match(/F[1-5]/)) gd[i].difficulty="GREEN";
 		return gd;
 	    });
 	    sh.wrap_after("getmaneuver",this,function(m) {
@@ -4720,14 +4720,6 @@ var UPGRADES=window.UPGRADES= [
             init: function(sh) {
                 var self=this;
                 sh.wrap_after("modifyattackroll",this,function(m,n,d,mm) {
-                    var i = 0;
-                    var activeweapon = 0;
-                    for (i; i < this.weapons.length; i++){
-                        if (this.weapons[i].isactive){
-                            activeweapon = i;
-                            break;
-                        }
-                    }
                     if (this.weapons[activeweapon].getauxiliarysector(targetunit)<4) 
                         if (Unit.FCH_focus(mm)>0) mm+=Unit.FCH_CRIT-Unit.FCH_FOCUS;
                     return mm;
@@ -4853,7 +4845,7 @@ var UPGRADES=window.UPGRADES= [
                     aiactivate: function(m,n) { return activeunit.stress>0;},
                     f:function(m,n) {
                         if (activeunit.stress>0) {
-                            activeunit.log("-1 stress from %0, +1 %EVADE% for %1 [%2]",activeunit.name,self.unit.name,self.name);
+                            activeunit.log("-1 stress, +1 %EVADE% for %0 [%1]",self.unit,self.name);
                             activeunit.removestresstoken();
                             return {m:m+Unit.FE_EVADE, n:n+1};
                         } else return {m:m,n:n};
@@ -5196,19 +5188,12 @@ var UPGRADES=window.UPGRADES= [
             points:2,
             type:Unit.ELITE,
             done:true,
-            // Snap Shot *is* a Secondary Weapon
-            isWeapon: function() { return true;},
-            // Snap Shot can only fire once per *phase*
-            // Not sure how to enact that part, though.
-            endattack: function(c,h) { this.unit.addhasfired(); },
-            attack: 2,
-            range: [1,1],
             init: function(sh) {
                 var self=this;
                 Unit.prototype.wrap_after("doendmaneuveraction",self,function() {
                     var wpl=[];
                     for (var i in self.unit.weapons)
-                        if (self.unit.weapons[i].name == "Snap Shot")
+                        if (self.unit.weapons[i].getrange(this)>0)
                             wpl.push(self.unit.weapons[i]);
 	     
                     if (wpl.length>0) {
@@ -5221,17 +5206,11 @@ var UPGRADES=window.UPGRADES= [
                                 return [];
                             }).unwrapper("cleanupattack");
                             self.unit.wrap_before("cancelattack",self,function() {
-                                //self.unit.maxfired++;
+                                self.unit.maxfired++;
                                 $("#attackdial").hide();
                                 self.unit.endnoaction(n,"ATTACK");
                             }).unwrapper("cleanupattack");
-                            // Check if this != this.isally(self.unit)?
-                            // In this context, self.unit is Snap Shot host
-                            // this is any ship
-                            if(!this.isally(self.unit) && 
-                                this.getrange(self.unit)<=wpl[0].gethighrange()){
-                                self.unit.doattack(wpl,[this]);
-                            } else self.unit.endnoaction(n,"ELITE");
+                            self.unit.doattack(wpl,[this]);
                         }.bind(this));
                     }
                 });
@@ -5350,7 +5329,6 @@ var UPGRADES=window.UPGRADES= [
                 var self=this;
                 Unit.prototype.wrap_after("endattack",self,function(c,h,t) {
                     if (self.isactive&&this.isally(self.unit)&&this.getrange(self.unit)<=2&&c+h===0) {
-		 
                         var p=this.selectnearbyally(3);
                         if (p.length>0) {
                             this.doselection(function(n) {
@@ -5663,7 +5641,7 @@ var UPGRADES=window.UPGRADES= [
                     for (var i in squadron) {
                         var u=squadron[i];
                         if (u.isally(this)) 
-                            t=t.concat(Unit.prototype.gettargetableunits.call(u,3));
+                            t=t.concat(Unit.prototype.gettargetableunits.vanilla.call(t,3));
                     }
                     return t;
                 });
@@ -5981,7 +5959,7 @@ var UPGRADES=window.UPGRADES= [
                         }
                     }
                 }
-            }
+            },
         },
         {name:"Bomblet Generator",
             unique:true,
@@ -6012,5 +5990,32 @@ var UPGRADES=window.UPGRADES= [
                 }
                 
             }
-        },
+	},
+        {name: "Synced Turret",
+            type: Unit.TURRET,
+            done:true,
+            firesnd:"falcon_fire",
+            requires:"Target",
+            consumes:false,
+            points: 4,
+            attack: 3,
+            range: [1,2],
+            init: function(sh) {
+                var self=this;
+                sh.wrap_after("attackrerolls",this,function(w,t,r) {
+                        return activeunit.weapons[0].attack;
+                });
+                sh.adddicemodifier(Unit.ATTACK_M,Unit.REROLL_M,Unit.ATTACK_M,this,{
+                    dice:["blank","focus"],
+                    n:function() { 
+                        return activeunit.weapons[0].attack; 
+                    },
+                    req:function(a,w,defender) {
+                        if (this.isinprimaryfiringarc(targetunit)){
+                            this.log("+%1 reroll(s) [%0]",self.name,(this.weapons[0].getattack()));
+                        }
+                        return self.isactive&&this.isinprimaryfiringarc(targetunit);
+                    }.bind(sh)});
+            },
+        }
     ];
