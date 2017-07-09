@@ -30,7 +30,11 @@ Bomb.prototype = {
     isWeapon() { return false; },
     isBomb() { return true; },
     canbedropped() { return this.isactive&&!this.unit.hasmoved&&this.unit.lastdrop!=round; },
-    desactivate() { this.isactive=false;this.unit.movelog("D-"+this.unit.upgrades.indexOf(this)); },
+    desactivate() { 
+        if (!this.permanent) {
+            this.isactive=false;this.unit.movelog("D-"+this.unit.upgrades.indexOf(this)); 
+        }
+    },
     getBall() {
 	var b=this.g.getBBox();
 	return {x:b.x+b.width/2,y:b.y+b.height/2,diam:Math.max(b.width/2,b.height/2)};
