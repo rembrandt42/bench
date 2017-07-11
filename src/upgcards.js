@@ -1164,9 +1164,9 @@ var UPGRADES=window.UPGRADES= [
 	    var self=this;
 	    sh.wrap_before("beginactivation",this,function() {
 		if (this.candoaction()&&!this.hasionizationeffect()) 
-		    this.doaction(this.getactionlist(),"").done(function(r) {
-			if (r!==null) this.wrap_after("candoendmaneuveraction",self,function() { return false;}).unwrapper("endactivationphase");
-		    }.bind(this));
+                this.doaction(this.getactionlist(),"").done(function(r) {
+                    if (r!==null) this.wrap_after("candoendmaneuveraction",self,function() { return false;}).unwrapper("endactivationphase");
+                }.bind(this));
 	    });
 	},
         type: Unit.SYSTEM,
@@ -1203,16 +1203,16 @@ var UPGRADES=window.UPGRADES= [
 	    var self=this;
 	    sh.addafterattackeffect(self,function() {
 		if (this.hasfired) 
-		    this.donoaction([{org:self,type:"CREW",name:self.name,action:function(n) {
-                                self.unit.log("+%1 %HIT% [%0]",self.name,2);
-                                targetunit.log("+1 %CRIT% [%0]",self.name); 
-                                this.resolvehit(2);
-                                SOUNDS.explode.play();
-                                targetunit.resolvecritical(1);
-                                this.checkdead();
-                                targetunit.checkdead();
-                                this.endnoaction(n,"CREW");
-                            }.bind(this)}],"",true);
+                this.donoaction([{org:self,type:"CREW",name:self.name,action:function(n) {
+                            self.unit.log("+%1 %HIT% [%0]",self.name,2);
+                            targetunit.log("+1 %CRIT% [%0]",self.name); 
+                            this.resolvehit(2);
+                            SOUNDS.explode.play();
+                            targetunit.resolvecritical(1);
+                            this.checkdead();
+                            targetunit.checkdead();
+                            this.endnoaction(n,"CREW");
+                        }.bind(this)}],"",true);
 	    });
 	},
         type: Unit.CREW,
@@ -3594,9 +3594,7 @@ var UPGRADES=window.UPGRADES= [
             init: function(sh) {
                 var self=this;
                 sh.wrap_after("resolveslam",this,function() {
-                    sh.wrap_before("endmaneuver",this,function() {
-                        this.doaction(this.getactionlist(),"+1 free action (Skip to cancel) ["+self.name+"]");
-                    });
+                    this.doaction(this.getactionlist(),"+1 free action (Skip to cancel) ["+self.name+"]");
                 });
             }
         },
@@ -5977,7 +5975,9 @@ var UPGRADES=window.UPGRADES= [
                 if (phase==ACTIVATION_PHASE&&!this.exploded) {
                     var r=this.getrangeallunits();
                     for (var i=0; i<r[1].length; i++) {
+                        var t=squadron[r[1][i].unit];
                         var roll=this.unit.rollattackdie(2,this,"hit");
+                    console.log(roll);
                         for (var i=0; i<2; i++) {
                             if (roll[i]=="hit"||roll[i]=="critical") {
                                 t.log("+1 %HIT% [%0]",this.name); 
@@ -6003,7 +6003,7 @@ var UPGRADES=window.UPGRADES= [
             init: function(sh) {
                 var self=this;
                 sh.wrap_after("attackrerolls",this,function(w,t,r) {
-                        return activeunit.weapons[0].attack;
+                    return activeunit.weapons[0].attack;
                 });
                 sh.adddicemodifier(Unit.ATTACK_M,Unit.REROLL_M,Unit.ATTACK_M,this,{
                     dice:["blank","focus"],
@@ -6011,10 +6011,14 @@ var UPGRADES=window.UPGRADES= [
                         return activeunit.weapons[0].attack; 
                     },
                     req:function(a,w,defender) {
-                        if (this.isinprimaryfiringarc(targetunit)){
-                            this.log("+%1 reroll(s) [%0]",self.name,(this.weapons[0].getattack()));
+                        if (sh.weapons[sh.activeweapon]==self){
+                            if (this.isinprimaryfiringarc(targetunit)){
+                                this.log("+%1 reroll(s) [%0]",self.name,(this.weapons[0].getattack()));
+                            }
+                            return self.isactive&&this.isinprimaryfiringarc(targetunit);
+                        } else {
+                            return false;
                         }
-                        return self.isactive&&this.isinprimaryfiringarc(targetunit);
                     }.bind(sh)});
             },
         }

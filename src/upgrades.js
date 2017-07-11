@@ -3,7 +3,7 @@
 TODO: desactivate  and unwrapping.
 Unit.prototype for old pilots and upgrades
 
-*/
+ */
 var Unit=window.Unit || {};
 var Mustache=window.Mustache || {};
 
@@ -15,26 +15,24 @@ function SUBAUXILIARY(i,j,m) { return this.getPrimarySubSectorString(i,j,m.clone
 
 
 function Bomb(sh,bdesc) {
-	$.extend(this,bdesc);
-	sh.upgrades.push(this);
-	this.isactive=true;
-	this.wrapping=[];
-	this.unit=sh;
-	sh.bombs.push(this);
-	this.exploded=false;
-	//if (this.init != undefined) this.init(sh);
+    $.extend(this,bdesc);
+    sh.upgrades.push(this);
+    this.isactive=true;
+    this.wrapping=[];
+    this.unit=sh;
+    sh.bombs.push(this);
+    this.exploded=false;
+    //if (this.init != undefined) this.init(sh);
 };
 Bomb.prototype = { 
-   wrap_before:Unit.prototype.wrap_before,
+    wrap_before:Unit.prototype.wrap_before,
     wrap_after:Unit.prototype.wrap_after,
     isWeapon() { return false; },
     isBomb() { return true; },
     canbedropped() { return this.isactive&&!this.unit.hasmoved&&this.unit.lastdrop!=round; },
     desactivate() { 
-        if (!this.permanent) {
-            this.isactive=false;this.unit.movelog("D-"+this.unit.upgrades.indexOf(this)); 
-        }
-    },
+        console.log('upgrades.js - bomb.unit - desactivate');
+        this.isactive=false;this.unit.movelog("D-"+this.unit.upgrades.indexOf(this)); },
     getBall() {
 	var b=this.g.getBBox();
 	return {x:b.x+b.width/2,y:b.y+b.height/2,diam:Math.max(b.width/2,b.height/2)};
@@ -107,15 +105,15 @@ Bomb.prototype = {
 	    resolve(moves[0],0,cleanup);
 	} else {
 	    for (i=0; i<moves.length; i++) {
-	    (function(k) {
-		this.pos[k]=this.getOutline(moves[k]).attr({fill:this.unit.color,opacity:0.7});
-		this.pos[k].hover(
+                (function(k) {
+                    this.pos[k]=this.getOutline(moves[k]).attr({fill:this.unit.color,opacity:0.7});
+                    this.pos[k].hover(
 		    function() {this.pos[k].attr({stroke:this.unit.color,strokeWidth:"4px"});}.bind(this),
 		    function() {this.pos[k].attr({strokeWidth:"0"});}.bind(this));
 		
-		this.pos[k].click(
+                    this.pos[k].click(
 		    function() { resolve(moves[k],k,cleanup); });
-	    }.bind(this))(i);
+                }.bind(this))(i);
 
 	    }
 	}
@@ -125,7 +123,11 @@ Bomb.prototype = {
 	if (this.ordnance) { 
 	    this.ordnance=false; 
 	    dropped=$.extend({},this);
-	} else this.desactivate();
+	} else if (this.permanent) {
+	    dropped=$.extend({},this);
+        } else {
+            this.desactivate();
+        }
 	dropped.resolveactionmove(this.unit.getbombposition(lm,this.size), function(k) {
 	    this.display(0,0);
 	    this.unit.bombdropped(this);
@@ -137,7 +139,7 @@ Bomb.prototype = {
 	if (x!==0||y!==0) this.m=this.m.clone().translate(x,y);
 	this.img1=s.image("png/"+this.img,-this.width/2,-this.height/2,this.width,this.height);
 	this.outline=this.getOutline(new Snap.Matrix())
-	    .attr({display:"block","class":"bombanim",stroke:halftone(BLUE),strokeWidth:2,fill:"rgba(8,8,8,0.3)"});
+        .attr({display:"block","class":"bombanim",stroke:halftone(BLUE),strokeWidth:2,fill:"rgba(8,8,8,0.3)"});
 	this.g=s.group(this.outline,this.img1);
 	this.g.hover(function () { 
 	    var m=VIEWPORT.m.clone();
@@ -203,17 +205,17 @@ Bomb.prototype = {
     show() {},
 }
 function Weapon(sh,wdesc) {
-	this.isprimary=false;
-	this.issecondary=true;
-	$.extend(this,wdesc);
-	sh.upgrades[sh.upgrades.length]=this;
-	this.wrapping=[];
-	this.ordnance=false;
-	//log("Installing weapon "+this.name+" ["+this.type+"]");
-	this.isactive=true;
-	this.unit=sh;
+    this.isprimary=false;
+    this.issecondary=true;
+    $.extend(this,wdesc);
+    sh.upgrades[sh.upgrades.length]=this;
+    this.wrapping=[];
+    this.ordnance=false;
+    //log("Installing weapon "+this.name+" ["+this.type+"]");
+    this.isactive=true;
+    this.unit=sh;
 
-	sh.weapons.push(this);
+    sh.weapons.push(this);
 }
 
 function Laser(u,type,fire) {
@@ -227,16 +229,16 @@ function Laser(u,type,fire) {
 	issecondary:false
     };
     switch(type) {
-    case "Bilaser":
-    case "Mobilelaser":
-	t.auxiliary=AUXILIARY;
-	t.subauxiliary=SUBAUXILIARY;
-	break;
-    case "Laser180":
-	t.auxiliary = function(i,m) { return this.getHalfRangeString(i,m); };
-	t.subauxiliary = function(i,j,m)  { return this.getHalfSubRangeString(i,j,m); };
-	break;
-    default: break;
+        case "Bilaser":
+        case "Mobilelaser":
+            t.auxiliary=AUXILIARY;
+            t.subauxiliary=SUBAUXILIARY;
+            break;
+        case "Laser180":
+            t.auxiliary = function(i,m) { return this.getHalfRangeString(i,m); };
+            t.subauxiliary = function(i,j,m)  { return this.getHalfSubRangeString(i,j,m); };
+            break;
+        default: break;
     };
     return new Weapon(u,t);
 }
@@ -249,7 +251,10 @@ Weapon.prototype={
     desactivate() {
 	if (this.ordnance&&this.type.match(/Torpedo|Missile|Illicit/)) {
 	    this.ordnance=false;
-	} else { this.isactive=false; /*this.unit.movelog("D-"+this.unit.upgrades.indexOf(this)); this.unit.show();*/ }
+	} else { 
+            
+        console.log('upgrades.js - weapon - desactivate');
+            this.isactive=false; /*this.unit.movelog("D-"+this.unit.upgrades.indexOf(this)); this.unit.show();*/ }
     },
     toString() {
 	this.tooltip = formatstring(getupgtxttranslation(this.name,this.type));
@@ -414,21 +419,21 @@ function Upgradefromid(sh,i) {
 }
 
 function Upgrade(sh,i) {
-	$.extend(this,UPGRADES[i]);
-	sh.upgrades.push(this);
-	this.isactive=true;
-	this.unit=sh;
-	this.wrapping=[];
-	this.ordnance=false;
-	/*
+    $.extend(this,UPGRADES[i]);
+    sh.upgrades.push(this);
+    this.isactive=true;
+    this.unit=sh;
+    this.wrapping=[];
+    this.ordnance=false;
+    /*
 	 var addedaction=this.addedaction;
 	 if (typeof addedaction!="undefined") {
 	 var added=addedaction.toUpperCase();
 	 sh.shipactionList.push(added);
 	 }
-	 */
-	//if (typeof this.init != "undefined") this.init(sh);
-    }
+     */
+    //if (typeof this.init != "undefined") this.init(sh);
+}
 Upgrade.prototype={
     wrap_before: Unit.prototype.wrap_before,
     wrap_after: Unit.prototype.wrap_after,
@@ -456,7 +461,10 @@ Upgrade.prototype={
     desactivate() {
 	if (this.ordnance&&this.type.match(/Torpedo|Missile|Illicit/)) {
 	    this.ordnance=false;
-	} else { this.isactive=false; this.unit.movelog("D-"+this.unit.upgrades.indexOf(this)); this.unit.show(); }
+	} else {
+            
+        console.log('upgrades.js - upgrades - desactivate');
+            this.isactive=false; this.unit.movelog("D-"+this.unit.upgrades.indexOf(this)); this.unit.show(); }
     },
     show() {},
     install(sh) {
@@ -499,7 +507,7 @@ Upgrade.prototype={
 		}
 	    }
 	    if (j<sh.upgradetype.length) {
-		if (sh.upg[j]>-1) removeupgrade(sh,j,sh.upg[j]);
+		/*if (sh.upg[j]>-1) removeupgrade(sh,j,sh.upg[j]);*/
 		sh.upg[j]=-2;
 	    }
 	    sh.showupgradeadd();
