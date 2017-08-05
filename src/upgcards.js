@@ -3066,6 +3066,7 @@ var UPGRADES=window.UPGRADES= [
             height:10,
             repeatx:42,
             size:22,
+            attack:2,
             stay:true,
             done:true,
             getOutlineStringsmall: function(m) {
@@ -3540,11 +3541,11 @@ var UPGRADES=window.UPGRADES= [
             done:true,
             init: function(sh) {
                 var self=this;
-                sh.wrap_after("modifydefenseroll",this,function(a,m,n,mm) {
+                sh.wrap_after("endmodifydefensestep",this,function(a,m,n,mm) {
                     if (Unit.FE_evade(mm)>0) mm=mm-Unit.FE_EVADE;
                     return mm;
                 });
-                sh.adddicemodifier(Unit.ATTACKCOMPARE_M,Unit.MOD_M,Unit.DEFENSE_M,this,{
+                sh.adddicemodifier(Unit.ATTACK_M,Unit.MOD_M,Unit.DEFENSE_M,this,{
                     req:function() {
                         return this.isinfiringarc(targetunit)&&self.isactive;
                     }.bind(sh),
@@ -3554,11 +3555,14 @@ var UPGRADES=window.UPGRADES= [
                     f:function(m,n) {
                         self.desactivate();
                         if (Unit.FE_evade(m)>0) {
-                            sh.log("-1 %EVADE% [%0]",self.name);
+                            targetunit.log("-1 %EVADE% [%0]",self.name);
                             m=m-Unit.FE_EVADE;
                         } 
                         return m;
                     },str:"evade"});
+                sh.wrap_after("setpriority",this,function(a) {
+                    if (a.type=="EVADE"&&this.evade===0) a.priority=0;
+                });
             }
         },
         {
@@ -5977,7 +5981,6 @@ var UPGRADES=window.UPGRADES= [
                     for (var i=0; i<r[1].length; i++) {
                         var t=squadron[r[1][i].unit];
                         var roll=this.unit.rollattackdie(2,this,"hit");
-                    console.log(roll);
                         for (var i=0; i<2; i++) {
                             if (roll[i]=="hit"||roll[i]=="critical") {
                                 t.log("+1 %HIT% [%0]",this.name); 
@@ -6021,5 +6024,59 @@ var UPGRADES=window.UPGRADES= [
                         }
                     }.bind(sh)});
             },
-        }
+        },
+        { /* v423 */
+            name: "Havoc",
+            done:true,
+            upgrades:[Unit.SALVAGED,Unit.SYSTEM],
+            type:Unit.TITLE,
+            points: 0,
+            ship: "Scurrg H-6 Bomber",
+        },
+        /*{
+            name: "Cruise Missiles",
+            type: Unit.MISSILE,
+            done:true,
+            firesnd:"missile",
+            requires:"Target",
+            consumes:false,
+            points: 3,
+            attack: 1,
+            range: [1,2],
+            init: function(sh){
+                var self=this;
+                sh.wrap_after("getattackstrength",this,function(w,sh,a) {
+                    console.log(sh);
+                    if (sh.lastmaneuver>=0){
+                        s=P[sh.getdial()[sh.lastmaneuver].move].speed;
+                    }
+                    return s+this.attack;
+                });
+            },
+        },*/
+    {
+        name: "Cruise Missiles",
+	requires:"Target",
+	consumes:false,
+        type: Unit.MISSILE,
+	firesnd:"missile",
+        points: 3,
+        attack: 1,
+	done:true,
+	init: function(sh) {
+	    var self=this;
+            sh.wrap_before("endmaneuver",this,function() {
+                speed = P[this.getdial()[this.maneuver].move].speed;
+                if (speed > 4)
+                    speed = 4;
+                
+                    self.attack = speed + 1;
+            });
+	    sh.wrap_after("setpriority",this,function(a) {
+		if (a.type=="TARGET"&&self.isactive&&this.candotarget()) 
+                    a.priority+=10;
+	    });
+	},
+        range: [1,2],
+    },
     ];
