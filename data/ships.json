@@ -389,7 +389,41 @@
 	],
 	"actionList":[ "FOCUS","TARGET","ROLL"] 
     },
-
+    "Scurrg H-6 Bomber": {
+	"wave":11,
+	"code":"B",
+	"firesnd":"xwing_fire",
+	"flysnd":"ywing_fly",
+	"faction":["REBEL","SCUM"],
+	"img":["scurrg"],
+	"scale":2.2,
+	"islarge":false,
+	"weapon_type":"Laser",
+	"fire":3,
+	"evade":1,
+	"hull":5,
+	"shield":5,
+	"dial":[
+	    {"move":"BL1","difficulty":"WHITE"},
+	    {"move":"F1","difficulty":"GREEN"},
+	    {"move":"BR1","difficulty":"WHITE"},
+	    {"move":"TL2","difficulty":"WHITE"},
+	    {"move":"BL2","difficulty":"GREEN"},
+	    {"move":"F2","difficulty":"GREEN"},
+	    {"move":"BR2","difficulty":"GREEN"},
+	    {"move":"TR2","difficulty":"WHITE"},
+	    {"move":"SL3","difficulty":"RED"},
+	    {"move":"TL3","difficulty":"RED"},
+	    {"move":"BL3","difficulty":"WHITE"},
+	    {"move":"F3","difficulty":"GREEN"},
+	    {"move":"BR3","difficulty":"WHITE"},
+	    {"move":"TR3","difficulty":"RED"},
+	    {"move":"SR3","difficulty":"RED"},
+	    {"move":"F4","difficulty":"WHITE"},
+	    {"move":"F5","difficulty":"RED"}
+	],
+	"actionList":[ "FOCUS","TARGET","ROLL"] 
+    },
     "TIE Fighter":{
 	"wave":1,
 	"code":"F",

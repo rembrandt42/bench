@@ -309,7 +309,8 @@
     "arccaster":"Arc Caster",
     "pulserayshield":"Pulse Ray Shield",
     "bombletgenerator":"Bomblet Generator",
-    "syncedturret":"Synced Turret"
+    "syncedturret":"Synced Turret",
+    "cruisemissle":"Cruise Missiles"
 },
 "pilots":{
     "senatorsshuttle":"Senator's Shuttle",
@@ -381,6 +382,11 @@
     "prototypepilot":"Prototype Pilot",
     "jakefarrell":"Jake Farrell",
     "gemmersojan":"Gemmer Sojan",
+    "scurrgh6bomber":"Scurrg H-6 Bomber",
+    "captainnym":"Captain Nym",
+    "solsixxa":"Sol Sixxa",
+    "lokrevenant":"Lok Revenant",
+    "karthakkpirate":"Karthakk Pirate",
     "yt1300":"YT-1300",
     "outerrimsmuggler":"Outer Rim Smuggler",
     "chewbacca":"Chewbacca",
